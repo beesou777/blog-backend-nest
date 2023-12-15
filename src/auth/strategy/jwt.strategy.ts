@@ -4,6 +4,7 @@ import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { PrismaService } from "src/prisma/prisma.service";
 
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(
     Strategy,
@@ -19,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(
         })
     }
 
-    async jwtValidate(playload:{
+    async validate(playload:{
         sub:number,
         email:string
     }){
