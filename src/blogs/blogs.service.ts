@@ -46,4 +46,47 @@ export class BlogsService {
             throw error
         }
     }
+
+    async getBlogsById(uuid:number,blogid:number){
+        try {
+            const blog = this.prisma.blog.findFirst({
+                where:{
+                    id:blogid,
+                    userId:uuid
+                }
+            })
+            console.log(uuid,blogid)
+            return blog
+        } catch (error) {
+            if(error instanceof PrismaClientKnownRequestError){
+                if(error.code === 'P2002'){
+                    throw new ForbiddenException("excess denies")
+                }
+            }
+        }
+    }
+
+    async updateBlogsById(){
+        try {
+            
+        } catch (error) {
+            if(error instanceof PrismaClientKnownRequestError){
+                if(error.code === 'P2002'){
+                    throw new ForbiddenException("excess denies")
+                }
+            }
+        }
+    }
+
+    async deleteBlogsById(){
+        try {
+            
+        } catch (error) {
+            if(error instanceof PrismaClientKnownRequestError){
+                if(error.code === 'P2002'){
+                    throw new ForbiddenException("excess denies")
+                }
+            }
+        }
+    }
 }

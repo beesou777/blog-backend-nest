@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { createBlogsDto } from './dto';
 import { BlogsService } from './blogs.service';
 import { JwtGuard } from 'src/auth/guard';
@@ -24,5 +24,23 @@ export class BlogsController {
         @GetUser('id') uuid:number,
     ){
         return this.blogService.getBlogs(uuid)
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @Get(':id')
+    getBlogsById(
+        @GetUser('id') uuid:number,
+        @Param('id',ParseIntPipe) blogId:number
+    ){
+        return this.blogService.getBlogsById(uuid,blogId)
+    }
+
+
+    updateBlogById(){
+        return this.blogService.updateBlogsById()
+    }
+
+    deleteBlogsById(){
+
     }
 }
