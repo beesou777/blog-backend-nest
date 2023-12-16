@@ -1,5 +1,5 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { createBlogsDto } from './dto';
+import { ForbiddenException, HttpCode, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { EditBlogsDto, createBlogsDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
@@ -74,9 +74,34 @@ export class BlogsService {
         }
     }
 
-    async updateBlogsById(){
+    async updateBlogsById(
+        dto:EditBlogsDto,
+        uuid:number,
+        blogId:number
+    ){
         try {
-            
+            const blog = await this.prisma.blog.findUnique({
+                where:{
+                    id:blogId,
+                }
+            })
+        
+            if (!blog) {
+                throw new HttpException('Blog not found', HttpStatus.NOT_FOUND);
+              }
+          
+              if (blog.userId !== uuid) {
+                throw new HttpException('You are not the owner', HttpStatus.FORBIDDEN);
+              }          
+
+            return this.prisma.blog.update({
+                where:{
+                    id:blogId
+                },
+                data:{
+                    ...dto
+                }
+            })
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
