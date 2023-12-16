@@ -8,7 +8,6 @@ export class BlogsService {
     constructor(private prisma:PrismaService){}
     async createBlogs(
         uuid:number,
-        userId:number,
         dto:createBlogsDto
     ){
         try {
@@ -24,6 +23,24 @@ export class BlogsService {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
                     throw new ForbiddenException('User not found')
+                }
+            }
+            throw error
+        }
+    }
+
+    async getBlogs(uuid:number){
+        try {
+            const blogs = await this.prisma.blog.findMany({
+                where:{
+                    userId:uuid
+                }
+            })
+            return blogs
+        } catch (error) {
+            if(error instanceof PrismaClientKnownRequestError){
+                if(error.code === 'P2002'){
+                    throw new ForbiddenException('excess to resource denied')
                 }
             }
             throw error
