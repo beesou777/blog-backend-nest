@@ -8,7 +8,8 @@ import { UserModule } from './user/user.module';
 import { UserService } from './user/user.service';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsModule } from './blogs/blogs.module';
-import { BlogsController } from './blogs/blogs.controller';
+import { BlogsService } from './blogs/blogs.service';
+
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { BlogsController } from './blogs/blogs.controller';
     BlogsModule
   ],
   controllers: [UserController, BlogsController],
-  providers:[UserService]
+  providers:[UserService,BlogsService]
 })
 export class AppModule { }
