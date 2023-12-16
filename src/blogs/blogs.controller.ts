@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post,UseGuards } from '@nestjs/common';
-import { EditBlogsDto, createBlogsDto } from './dto';
+import { EditBlogsDto, UpdateBlogsDto, createBlogsDto } from './dto';
 import { BlogsService } from './blogs.service';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
@@ -35,7 +35,6 @@ export class BlogsController {
         return this.blogService.getBlogsById(uuid,blogId)
     }
 
-    
     @Patch(':id')
     updateBlogById(
         @GetUser('id') uuid:number,
@@ -51,5 +50,14 @@ export class BlogsController {
         @Param('id',ParseIntPipe) blogId:number
     ){
         return this.blogService.deleteBlogsById(uuid,blogId)
+    }
+
+    @Patch(':id')
+    updateUpvote(
+        @GetUser('id') uuid:number,
+        @Body() dto:UpdateBlogsDto,
+        @Param('id',ParseIntPipe) blogId:number
+         ){
+        return this.blogService.updateUpvote(dto,uuid,blogId)
     }
 }

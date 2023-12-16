@@ -33,4 +33,6 @@ model Blog {
   content    String
   blogImages String
   upvote     Int
+  increment Boolean
+  decrement Boolean
 }

@@ -8,6 +8,8 @@ CREATE TABLE "Blog" (
     "content" TEXT NOT NULL,
     "blogImages" TEXT NOT NULL,
     "upvote" INTEGER NOT NULL,
+    "increment" BOOLEAN NOT NULL,
+    "decrement" BOOLEAN NOT NULL,
 
     CONSTRAINT "Blog_pkey" PRIMARY KEY ("id")
 );
