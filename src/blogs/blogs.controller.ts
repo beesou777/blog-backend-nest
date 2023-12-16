@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { createBlogsDto } from './dto';
 import { BlogsService } from './blogs.service';
 import { JwtGuard } from 'src/auth/guard';
@@ -40,7 +40,11 @@ export class BlogsController {
         return this.blogService.updateBlogsById()
     }
 
-    deleteBlogsById(){
-
+    @Delete(':id')
+    deleteBlogsById(
+        @GetUser('id') uuid:number,
+        @Param('id',ParseIntPipe) blogId:number
+    ){
+        return this.blogService.deleteBlogsById(uuid,blogId)
     }
 }

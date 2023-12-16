@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { createBlogsDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -47,20 +47,28 @@ export class BlogsService {
         }
     }
 
-    async getBlogsById(uuid:number,blogid:number){
+   /**
+    * The function `getBlogsById` retrieves a blog by its ID and the user's UUID, and throws a
+    * ForbiddenException if there is an access denial error.
+    * @param {number} uuid - The `uuid` parameter is a number that represents the user's unique
+    * identifier. It is used to filter the blogs based on the user who created them.
+    * @param {number} blogId - The `blogid` parameter is the unique identifier of a specific blog. It
+    * is used to query the database and retrieve the blog with the matching ID.
+    * @returns the blog object that matches the given UUID and blog ID.
+    */
+    async getBlogsById(uuid:number,blogId:number){
         try {
             const blog = this.prisma.blog.findFirst({
                 where:{
-                    id:blogid,
+                    id:blogId,
                     userId:uuid
                 }
             })
-            console.log(uuid,blogid)
             return blog
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
-                    throw new ForbiddenException("excess denies")
+                    throw new ForbiddenException("excess denied")
                 }
             }
         }
@@ -78,9 +86,24 @@ export class BlogsService {
         }
     }
 
-    async deleteBlogsById(){
+    async deleteBlogsById(
+        uuid:number,
+        blogId:number
+    ){
         try {
-            
+            const blog = await this.prisma.blog.delete({
+                where:{
+                    id:blogId,
+                    userId:uuid
+                }
+            })
+
+            if(!blog){
+                throw new NotFoundException("blog not found")
+            }
+            return {
+                message:"success fully deleted"
+            }
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
