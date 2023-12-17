@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsString } from "class-validator";
 
 export class createBlogsDto{
     @IsString()
@@ -7,11 +7,21 @@ export class createBlogsDto{
 
     @IsString()
     @IsNotEmpty()
+    slug:string;
+
+    @IsString()
+    @IsNotEmpty()
     content:string;
 
     @IsString()
     @IsNotEmpty()
-    blogImages:string;
+    body:string;
+
+    @IsArray()
+    @IsNotEmpty()
+    tagList:string[];
 
     upvote:number = 0;
+
+    upvoted:boolean = false
 }

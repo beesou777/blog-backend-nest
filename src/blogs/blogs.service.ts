@@ -12,20 +12,26 @@ export class BlogsService {
         dto:createBlogsDto
     ){
         try {
+            const slugify = dto.slug.replace(/\s+/g,'-').toLocaleLowerCase() + (Math.random() * Math.pow(36,6) | 0).toString(36)
+
             const blog = await this.prisma.blog.create({
                 data:{
                     userId:uuid,
-                    ...dto,
+                    slug:slugify,
+                    title:dto.title,
+                    body:dto.body,
+                    content:dto.content,
+                    tagList:dto.tagList,
                     upvote:0,
-                    increment:false,
-                    decrement:true
+                    upvoted:false
                 }
             })
            return blog
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
-                    throw new ForbiddenException('User not found')
+                    console.log(error)
+                    throw new ForbiddenException('excess denied')
                 }
             }
             throw error
@@ -132,35 +138,35 @@ export class BlogsService {
         }
     }
 
-    async updateUpvote(
-        dto:UpdateBlogsDto,
-        uuid:number,
-        blogId:number
-        ){
-            try {
-                const blog = await this.prisma.blog.findUnique({
-                    where:{
-                        id:blogId,
-                    }
-                })
+    // async updateUpvote(
+    //     dto:UpdateBlogsDto,
+    //     uuid:number,
+    //     blogId:number
+    //     ){
+    //         try {
+    //             const blog = await this.prisma.blog.findUnique({
+    //                 where:{
+    //                     id:blogId,
+    //                 }
+    //             })
             
-                if (!blog) {
-                    throw new HttpException('Blog not found', HttpStatus.NOT_FOUND);
-                  }
+    //             if (!blog) {
+    //                 throw new HttpException('Blog not found', HttpStatus.NOT_FOUND);
+    //               }
               
-                  if (blog.userId !== uuid) {
-                    throw new HttpException('You are not the owner', HttpStatus.FORBIDDEN);
-                  }          
+    //               if (blog.userId !== uuid) {
+    //                 throw new HttpException('You are not the owner', HttpStatus.FORBIDDEN);
+    //               }          
 
-                  if(dto.increment == true){
-                    return 
-                  }
-            } catch (error) {
-                if(error instanceof PrismaClientKnownRequestError){
-                    if(error.code === 'P2002'){
-                        throw new ForbiddenException("excess denies")
-                    }
-                }
-            }
-    }
+    //               if(dto.increment == true){
+    //                 return 
+    //               }
+    //         } catch (error) {
+    //             if(error instanceof PrismaClientKnownRequestError){
+    //                 if(error.code === 'P2002'){
+    //                     throw new ForbiddenException("excess denies")
+    //                 }
+    //             }
+    //         }
+    // }
 }

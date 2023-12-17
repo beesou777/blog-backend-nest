@@ -52,12 +52,12 @@ export class BlogsController {
         return this.blogService.deleteBlogsById(uuid,blogId)
     }
 
-    @Patch(':id')
-    updateUpvote(
-        @GetUser('id') uuid:number,
-        @Body() dto:UpdateBlogsDto,
-        @Param('id',ParseIntPipe) blogId:number
-         ){
-        return this.blogService.updateUpvote(dto,uuid,blogId)
-    }
+    // @Patch(':id')
+    // updateUpvote(
+    //     @GetUser('id') uuid:number,
+    //     @Body() dto:UpdateBlogsDto,
+    //     @Param('id',ParseIntPipe) blogId:number
+    //      ){
+    //     return this.blogService.updateUpvote(dto,uuid,blogId)
+    // }
 }
