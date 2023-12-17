@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { EditBlogsDto, UpdateBlogsDto, createBlogsDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -78,14 +78,14 @@ export class BlogsService {
 
     async getBlogBySlug(slug?: string) {
         try {
-            const blog = await this.prisma.blog.findMany({
+            const blog = await this.prisma.blog.findFirst({
                 where:{
                     slug:slug
                 }
             });
     
     
-            if (!blog || blog.length === 0) {
+            if (!blog) {
                 throw new NotFoundException('Blog not found');
             }
     
@@ -182,7 +182,34 @@ export class BlogsService {
         }
     }
 
+    async searchBlog(search:string){
+        try {
+            const blog = await this.prisma.blog.findMany({
+                where:{
+                    slug:{
+                        contains:search
+                    }
+                }
+            });
     
+            if (!blog || blog.length === 0) {
+                throw new NotFoundException('Blog not found');
+            }
+    
+            return blog;
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                if (error.code === 'P2002') {
+                    throw new ForbiddenException('Access denied');
+                }
+    
+                if (error.code === 'P2025') {
+                    throw new NotFoundException('Blog not found');
+                }
+            }
+            throw error;
+        }
+    }
 
     // async updateUpvote(
     //     dto:UpdateBlogsDto,

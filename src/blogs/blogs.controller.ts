@@ -26,7 +26,16 @@ export class BlogsController {
         return this.blogService.getBlogs(uuid)
     }
 
-    
+    @HttpCode(HttpStatus.OK)
+    @Get('search')
+    searchBlog(@Query() search: any) {
+        try {
+            return this.blogService.searchBlog(search.search)
+        } catch (error) {
+            console.log(error);
+        }
+    }  
+
     @HttpCode(HttpStatus.OK)
     @Get(':slug')
     getBlogBySlug(@Param() slug: any) {
@@ -36,6 +45,7 @@ export class BlogsController {
             console.log(error);
         }
     }    
+
 
     @HttpCode(HttpStatus.OK)
     @Get(':id')
