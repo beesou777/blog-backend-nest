@@ -2,8 +2,6 @@ import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundExce
 import { EditBlogsDto, UpdateBlogsDto, createBlogsDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { validate } from 'class-validator';
-import { EntityNotFoundError } from 'src/middleware/middleware';
 
 @Injectable()
 export class BlogsService {
@@ -78,12 +76,42 @@ export class BlogsService {
         }
     }
 
+    async getBlogBySlug(slug?: string) {
+        try {
+            const blog = await this.prisma.blog.findMany({
+                where:{
+                    slug:slug
+                }
+            });
+    
+    
+            if (!blog || blog.length === 0) {
+                throw new NotFoundException('Blog not found');
+            }
+    
+            return blog;
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                if (error.code === 'P2002') {
+                    throw new ForbiddenException('Access denied');
+                }
+    
+                if (error.code === 'P2025') {
+                    throw new NotFoundException('Blog not found');
+                }
+            }
+            throw error;
+        }
+    }
+    
+
     async updateBlogsById(
         dto:EditBlogsDto,
         uuid:number,
         blogId:number
     ){
         try {
+
             const blog = await this.prisma.blog.findUnique({
                 where:{
                     id:blogId,
@@ -153,6 +181,8 @@ export class BlogsService {
             throw error
         }
     }
+
+    
 
     // async updateUpvote(
     //     dto:UpdateBlogsDto,

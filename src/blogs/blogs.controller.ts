@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post,Req,UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post,Query,Req,UseGuards } from '@nestjs/common';
 import { EditBlogsDto, UpdateBlogsDto, createBlogsDto } from './dto';
 import { BlogsService } from './blogs.service';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
-import { User } from '@prisma/client';
+import { Blog, User } from '@prisma/client';
 
 
 @UseGuards(JwtGuard)
@@ -19,12 +19,23 @@ export class BlogsController {
     }
 
     @HttpCode(HttpStatus.OK)
-    @Get('')
+    @Get()
     getBlogs(
         @GetUser('id') uuid:number,
     ){
         return this.blogService.getBlogs(uuid)
     }
+
+    
+    @HttpCode(HttpStatus.OK)
+    @Get(':slug')
+    getBlogBySlug(@Param() slug: any) {
+        try {
+            return this.blogService.getBlogBySlug(slug.slug)
+        } catch (error) {
+            console.log(error);
+        }
+    }    
 
     @HttpCode(HttpStatus.OK)
     @Get(':id')
