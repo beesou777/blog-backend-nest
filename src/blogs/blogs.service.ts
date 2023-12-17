@@ -1,11 +1,15 @@
-import { ForbiddenException, HttpCode, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common';
 import { EditBlogsDto, UpdateBlogsDto, createBlogsDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { validate } from 'class-validator';
+import { EntityNotFoundError } from 'src/middleware/middleware';
 
 @Injectable()
 export class BlogsService {
-    constructor(private prisma:PrismaService){}
+    constructor(
+        private prisma:PrismaService,
+        ){}
 
     async createBlogs(
         uuid:number,
@@ -94,7 +98,8 @@ export class BlogsService {
                 throw new HttpException('You are not the owner', HttpStatus.FORBIDDEN);
               }          
 
-            return this.prisma.blog.update({
+            console.log(dto)
+            const data = await this.prisma.blog.update({
                 where:{
                     id:blogId
                 },
@@ -102,19 +107,21 @@ export class BlogsService {
                     ...dto
                 }
             })
+            return data
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
                     throw new ForbiddenException("excess denies")
                 }
             }
+            throw error
         }
     }
 
     async deleteBlogsById(
         uuid:number,
         blogId:number
-    ){
+    ):Promise<any>{
         try {
             const blog = await this.prisma.blog.delete({
                 where:{
@@ -122,19 +129,28 @@ export class BlogsService {
                     userId:uuid
                 }
             })
-
             if(!blog){
-                throw new NotFoundException("blog not found")
+               console.log("hello")
             }
-            return {
-                message:"success fully deleted"
+            try {
+                return {
+                    message:"success fully deleted"
+                }
+            } catch (error) {
+                throw new NotFoundException('Blog not found');
             }
+
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
                     throw new ForbiddenException("excess denies")
                 }
+
+                if(error.code === 'P2025'){
+                    throw new NotFoundException('blog not found')
+                }
             }
+            throw error
         }
     }
 

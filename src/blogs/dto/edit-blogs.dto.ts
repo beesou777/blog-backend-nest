@@ -11,5 +11,13 @@ export class EditBlogsDto{
 
     @IsString()
     @IsOptional()
-    blogImages:string;
+    body:string;
+
+    @IsString()
+    @IsOptional()
+    slug:string;
+
+    @IsString()
+    @IsOptional()
+    tagList:string[];
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post,UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post,Req,UseGuards } from '@nestjs/common';
 import { EditBlogsDto, UpdateBlogsDto, createBlogsDto } from './dto';
 import { BlogsService } from './blogs.service';
 import { JwtGuard } from 'src/auth/guard';
@@ -49,7 +49,11 @@ export class BlogsController {
         @GetUser('id') uuid:number,
         @Param('id',ParseIntPipe) blogId:number
     ){
+       try {
         return this.blogService.deleteBlogsById(uuid,blogId)
+       } catch (error) {
+        throw new NotFoundException('Blog not found');
+       }
     }
 
     // @Patch(':id')
